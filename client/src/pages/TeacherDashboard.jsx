@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { sessions, checkpoints as cpApi } from '../api.js';
 import MapPicker from '../components/MapPicker.jsx';
 import QRDisplay from '../components/QRDisplay.jsx';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 
 const STEPS = ['NAME', 'PLACE', 'LAUNCH'];
 const LS_KEY = 'orienteering_teacher_sessions';
@@ -178,20 +179,23 @@ export default function TeacherDashboard() {
           )}
         </div>
 
-        {/* Step indicator */}
-        <div className="ml-auto hidden sm:flex items-center gap-2">
-          {STEPS.map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-full text-xs font-orbitron font-bold flex items-center justify-center border transition-all
-                ${i < step  ? 'border-cyber-green  bg-cyber-green/10  text-cyber-green'
-                : i === step ? 'border-cyber-cyan   bg-cyber-cyan/10   text-cyber-cyan shadow-neon-cyan'
-                :              'border-cyber-border bg-transparent     text-cyber-muted'}`}>
-                {i < step ? 'OK' : i + 1}
+        {/* Step indicator + theme toggle */}
+        <div className="ml-auto flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2">
+            {STEPS.map((s, i) => (
+              <div key={s} className="flex items-center gap-2">
+                <div className={`w-7 h-7 rounded-full text-xs font-orbitron font-bold flex items-center justify-center border transition-all
+                  ${i < step  ? 'border-cyber-green  bg-cyber-green/10  text-cyber-green'
+                  : i === step ? 'border-cyber-cyan   bg-cyber-cyan/10   text-cyber-cyan shadow-neon-cyan'
+                  :              'border-cyber-border bg-transparent     text-cyber-muted'}`}>
+                  {i < step ? 'OK' : i + 1}
+                </div>
+                <span className={`text-xs font-mono-cyber hidden md:block tracking-widest ${i === step ? 'text-cyber-cyan' : 'text-cyber-muted'}`}>{s}</span>
+                {i < STEPS.length - 1 && <div className="w-5 h-px bg-cyber-border mx-1" />}
               </div>
-              <span className={`text-xs font-mono-cyber hidden md:block tracking-widest ${i === step ? 'text-cyber-cyan' : 'text-cyber-muted'}`}>{s}</span>
-              {i < STEPS.length - 1 && <div className="w-5 h-px bg-cyber-border mx-1" />}
-            </div>
-          ))}
+            ))}
+          </div>
+          <ThemeToggle />
         </div>
       </header>
 

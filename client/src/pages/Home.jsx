@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -6,6 +7,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-cyber-bg flex flex-col items-center justify-center p-6 relative overflow-hidden">
       <div className="scanlines" />
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
 
       {/* Background grid */}
       <div className="absolute inset-0 pointer-events-none"

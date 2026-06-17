@@ -5,6 +5,7 @@ import StudentMap from '../components/StudentMap.jsx';
 import TaskCard from '../components/TaskCard.jsx';
 import HintPanel from '../components/HintPanel.jsx';
 import ARView from '../components/ARView.jsx';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 import { haversine, fmtDistance, TASK_META, DIFF_META, UNLOCK_DISTANCE } from '../utils.js';
 
 const PHASE = { JOIN: 'join', MAP: 'map', TASK: 'task', SUBMIT: 'submit', FINISHED: 'finished' };
@@ -447,10 +448,13 @@ export default function StudentView() {
             className="text-xs font-mono-cyber px-3 py-1.5 rounded-lg border border-cyber-purple/50 text-cyber-purple bg-cyber-purple/10 hover:bg-cyber-purple/20 transition-colors">
             Scores
           </button>
-          <div className="text-right">
-            <div className="text-xs text-cyber-muted font-mono-cyber tracking-widest">Waypoint</div>
-            <div className="font-orbitron font-bold text-cyber-cyan">
-              {cpIndex + 1}<span className="text-cyber-muted text-sm">/{checkpoints.length}</span>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <div className="text-right">
+              <div className="text-xs text-cyber-muted font-mono-cyber tracking-widest">Waypoint</div>
+              <div className="font-orbitron font-bold text-cyber-cyan">
+                {cpIndex + 1}<span className="text-cyber-muted text-sm">/{checkpoints.length}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -561,6 +565,7 @@ export default function StudentView() {
                   </span>
                 </div>
               )}
+              <ThemeToggle />
             </div>
           </div>
           <div className="flex gap-1 mt-2.5">
