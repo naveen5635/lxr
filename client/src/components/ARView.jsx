@@ -17,8 +17,9 @@ export default function ARView({ userPos, currentCp, distance, canUnlock, onUnlo
   const animRef    = useRef(null);
   const headingRef = useRef(null); // use ref not state to avoid re-render in draw loop
 
-  const [cameraError,  setCameraError]  = useState('');
-  const [hasCompass,   setHasCompass]   = useState(false);
+  const [cameraError,   setCameraError]  = useState('');
+  const [hasCompass,    setHasCompass]   = useState(false);
+  const [displayHeading, setDisplayHeading] = useState(null);
   const [iosNeedsPerm, setIosNeedsPerm] = useState(
     typeof DeviceOrientationEvent !== 'undefined' &&
     typeof DeviceOrientationEvent.requestPermission === 'function'
@@ -66,6 +67,14 @@ export default function ARView({ userPos, currentCp, distance, canUnlock, onUnlo
       window.removeEventListener('deviceorientation', onOrientation, true);
     };
   }, [iosNeedsPerm]);
+
+  // Sync compass heading to state every 250 ms so the HTML sign re-renders
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (headingRef.current !== null) setDisplayHeading(headingRef.current);
+    }, 250);
+    return () => clearInterval(id);
+  }, []);
 
   async function requestIosCompass() {
     try {
@@ -199,6 +208,27 @@ export default function ARView({ userPos, currentCp, distance, canUnlock, onUnlo
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userPos, currentCp, distance, canUnlock]);
 
+  // ── Direction sign helpers ───────────────────────────────────────────────
+  const tgtBearing = (userPos && currentCp) ? calcBearing(userPos, currentCp) : null;
+  const relAngle   = (tgtBearing !== null && displayHeading !== null)
+    ? (tgtBearing - displayHeading + 360) % 360
+    : null;
+
+  function getDirectionSign(a) {
+    if (a < 30  || a >= 330) return { arrow: '↑', text: 'STRAIGHT AHEAD' };
+    if (a < 75)              return { arrow: '↗', text: 'BEAR RIGHT' };
+    if (a < 150)             return { arrow: '→', text: 'TURN RIGHT' };
+    if (a < 210)             return { arrow: '↓', text: 'TURN AROUND' };
+    if (a < 285)             return { arrow: '←', text: 'TURN LEFT' };
+    return                          { arrow: '↖', text: 'BEAR LEFT' };
+  }
+  function toCardinal(b) {
+    return ['N','NE','E','SE','S','SW','W','NW'][Math.round(b / 45) % 8];
+  }
+  const dirSign = relAngle !== null ? getDirectionSign(relAngle) : null;
+  const neonColor = canUnlock ? '#00ff85' : '#00e5ff';
+  const neonRgba  = canUnlock ? 'rgba(0,255,133,0.5)' : 'rgba(0,229,255,0.5)';
+
   // ────────────────────────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-50 bg-black overflow-hidden select-none">
@@ -267,6 +297,27 @@ export default function ARView({ userPos, currentCp, distance, canUnlock, onUnlo
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-32 h-32 rounded-full border-4 border-cyber-green animate-pulse"
                style={{ boxShadow: '0 0 40px rgba(0,255,133,0.4), inset 0 0 40px rgba(0,255,133,0.1)' }} />
+        </div>
+      )}
+
+      {/* Direction sign */}
+      {tgtBearing !== null && !cameraError && !iosNeedsPerm && (
+        <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none" style={{ bottom: '170px' }}>
+          <div className="flex flex-col items-center gap-1.5 rounded-2xl px-8 py-4 text-center"
+            style={{ background: 'rgba(6,6,15,0.78)', border: `1px solid ${neonRgba}`, backdropFilter: 'blur(6px)', minWidth: '180px' }}>
+            {/* big arrow character */}
+            <div style={{ fontSize: '2.6rem', lineHeight: 1, color: neonColor, filter: `drop-shadow(0 0 10px ${neonColor})` }}>
+              {dirSign ? dirSign.arrow : '?'}
+            </div>
+            {/* direction label */}
+            <div className="font-orbitron font-black text-xs tracking-widest" style={{ color: neonColor }}>
+              {dirSign ? dirSign.text : `HEADING ${toCardinal(tgtBearing)}`}
+            </div>
+            {/* bearing sub-label */}
+            <div className="font-mono-cyber text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              {toCardinal(tgtBearing)} · {Math.round(tgtBearing)}°
+            </div>
+          </div>
         </div>
       )}
 

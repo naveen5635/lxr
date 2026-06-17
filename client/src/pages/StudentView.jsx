@@ -473,6 +473,10 @@ export default function StudentView() {
               {gpsError}
             </div>
           )}
+          <button onClick={handleUnlockTask} disabled={taskLoading}
+            className="absolute top-3 right-3 z-20 text-xs text-cyber-cyan/50 underline font-mono-cyber bg-cyber-bg/70 px-2 py-1 rounded">
+            Demo: skip GPS
+          </button>
         </div>
 
         <div className="bg-cyber-card/95 backdrop-blur border-t border-cyber-border px-4 pt-4 pb-5 safe-bottom relative z-10">
@@ -523,12 +527,6 @@ export default function StudentView() {
                 </button>
               </div>
 
-              {!userPos && (
-                <button onClick={handleUnlockTask} disabled={taskLoading}
-                  className="w-full text-xs text-cyber-cyan/50 underline font-mono-cyber">
-                  Demo: unlock without GPS
-                </button>
-              )}
             </>
           )}
         </div>
